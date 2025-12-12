@@ -111,6 +111,14 @@ export const verifyLogin = async (req, res) => {
 
     const user = results[0];
 
+    if(user.group_id!=1 || user.group_id!=2){
+      return res.status(400).json({
+        success: false,
+        message: 'User not found',
+        datas: []
+      });
+    }
+
     // Validate password
     const isValid = validPassword(password, user.salt, user.hash);
 
