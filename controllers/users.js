@@ -470,6 +470,13 @@ export const verifyLogin = async (req, res) => {
    // }
 
     if (result.length > 0) {
+      if (!result[0].salt || !result[0].hash) {
+        return res.status(400).json({
+          success: false,
+          message: 'Password not matched',
+          datas: []
+        });
+      }
       const isValid = validPassword(password, result[0].salt, result[0].hash);
 
       if (isValid) {
