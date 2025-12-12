@@ -1,4 +1,4 @@
-import getPool from '../db.js';
+
 import config from '../config.js';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
