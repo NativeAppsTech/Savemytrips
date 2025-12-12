@@ -82,7 +82,7 @@ export const verifyLogin = async (req, res) => {
   }
 
   try {
-    // Fetch full user details (you need salt + hash + group_id etc.)
+    // Fetch user
     const query = `
       SELECT 
         id, 
@@ -99,9 +99,14 @@ export const verifyLogin = async (req, res) => {
       LIMIT 1
     `;
 
-    const [results] = await db.query(query, [email]);
+    const results = await new Promise((resolve, reject) => {
+      db.query(query, [email], (err, rows) => {
+        if (err) reject(err);
+        resolve(rows);
+      });
+    });
 
-    if (results.length === 0) {
+    if (!results || results.length === 0) {
       return res.status(400).json({
         success: false,
         message: 'User not found',
@@ -111,10 +116,26 @@ export const verifyLogin = async (req, res) => {
 
     const user = results[0];
 
-    if(user.group_id!=1 || user.group_id!=2){
+    // FIX YOUR CONDITION
+    // ❌ if (user.group_id!=1 || user.group_id!=2)
+    // This ALWAYS becomes true
+    // Why? Because if group_id=1, it's NOT 2 → TRUE
+    // If group_id=2, it's NOT 1 → TRUE
+
+    // ✔ Correct version:
+    if (user.group_id !== 1 && user.group_id !== 2) {
       return res.status(400).json({
         success: false,
         message: 'User not found',
+        datas: []
+      });
+    }
+
+    // Check password fields
+    if (!user.salt || !user.hash) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password not set for this user',
         datas: []
       });
     }
@@ -130,7 +151,7 @@ export const verifyLogin = async (req, res) => {
       });
     }
 
-    // Prepare user details
+    // User details
     const userdet = {
       first_name: user.first_name,
       last_name: user.last_name,
@@ -139,7 +160,7 @@ export const verifyLogin = async (req, res) => {
       countrycode: user.country_code
     };
 
-    // Generate token
+    // Token
     const token = generateJwt(user.id, user.group_id, user.email_id);
 
     return res.status(200).json({
@@ -157,6 +178,7 @@ export const verifyLogin = async (req, res) => {
     });
   }
 };
+
 
 
 // export const setpassword = async (req, res) => {
