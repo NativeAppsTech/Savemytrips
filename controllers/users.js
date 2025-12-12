@@ -132,18 +132,21 @@ export const checkEmailPresent = async (req, res) => {
   }
 };
 
-export const sendOTP = async (req, res) => { 
+export const sendOTP = async (req, res) => {
   try {
     const otp = getRandomInt(100000, 999999);
     const { salt, hash } = getPassword("smt" + otp);
 
     if (!req.body) {
-      return res.status(400).json({ success: false, message: "All input missing" });
+      return res.status(400).json({
+        success: false,
+        message: "All input missing"
+      });
     }
 
     const { email, phone_number, countrycode } = req.body;
     const db = req.db;
-    var send=1;
+
     // -------------------------
     // PHONE OTP FLOW
     // -------------------------
@@ -161,7 +164,12 @@ export const sendOTP = async (req, res) => {
         WHERE phone = ? AND countrycode = ?
       `;
 
-      const [rows] = await db.query(selectQuery, [phone_number, countrycode]);
+      const rows = await new Promise((resolve, reject) => {
+        db.query(selectQuery, [phone_number, countrycode], (err, result) => {
+          if (err) reject(err);
+          resolve(result);
+        });
+      });
 
       if (rows.length > 0) {
         // Update
@@ -170,7 +178,12 @@ export const sendOTP = async (req, res) => {
           SET hash = ?, salt = ? 
           WHERE phone = ? AND countrycode = ?
         `;
-        await db.query(updateQuery, [hash, salt, phone_number, countrycode]);
+        await new Promise((resolve, reject) => {
+          db.query(updateQuery, [hash, salt, phone_number, countrycode], (err) => {
+            if (err) reject(err);
+            resolve();
+          });
+        });
 
       } else {
         // Insert
@@ -178,7 +191,12 @@ export const sendOTP = async (req, res) => {
           INSERT INTO smt_login_otp (phone, countrycode, hash, salt)
           VALUES (?, ?, ?, ?)
         `;
-        await db.query(insertQuery, [phone_number, countrycode, hash, salt]);
+        await new Promise((resolve, reject) => {
+          db.query(insertQuery, [phone_number, countrycode, hash, salt], (err) => {
+            if (err) reject(err);
+            resolve();
+          });
+        });
       }
     }
 
@@ -190,7 +208,13 @@ export const sendOTP = async (req, res) => {
         SELECT id FROM smt_login_otp 
         WHERE email_id = ?
       `;
-      const [rows] = await db.query(selectQuery, [email]);
+
+      const rows = await new Promise((resolve, reject) => {
+        db.query(selectQuery, [email], (err, result) => {
+          if (err) reject(err);
+          resolve(result);
+        });
+      });
 
       if (rows.length > 0) {
         const updateQuery = `
@@ -198,25 +222,38 @@ export const sendOTP = async (req, res) => {
           SET hash = ?, salt = ?
           WHERE email_id = ?
         `;
-        await db.query(updateQuery, [hash, salt, email]);
+
+        await new Promise((resolve, reject) => {
+          db.query(updateQuery, [hash, salt, email], (err) => {
+            if (err) reject(err);
+            resolve();
+          });
+        });
 
       } else {
         const insertQuery = `
           INSERT INTO smt_login_otp (email_id, hash, salt) 
           VALUES (?, ?, ?)
         `;
-        await db.query(insertQuery, [email, hash, salt]);
+
+        await new Promise((resolve, reject) => {
+          db.query(insertQuery, [email, hash, salt], (err) => {
+            if (err) reject(err);
+            resolve();
+          });
+        });
       }
     }
 
+    // SUCCESS RESPONSE
     return res.status(200).json({
       success: true,
       message: "OTP sent",
-      datas: [{ otp }], // remove in production
+      datas: [{ otp }], // remove OTP in production
     });
 
   } catch (error) {
-    console.error(error);
+    console.error("Error in sendOTP:", error);
     return res.status(500).json({
       success: false,
       message: "Server error",
@@ -224,6 +261,7 @@ export const sendOTP = async (req, res) => {
     });
   }
 };
+
 
 
 // export const verifyLogin = async (req, res) => { 
