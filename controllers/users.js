@@ -85,6 +85,21 @@ function validPassword(password, salt, hashFromDB) {
 //           });
 // }
 
+export const checkPhoneExists = async (phone, country_code, db) => {
+  return new Promise((resolve, reject) => {
+    const query = `SELECT id FROM smt_users WHERE phone = ? AND country_code = ? LIMIT 1`;
+
+    db.query(query, [phone, country_code], (err, results) => {
+      if (err) return reject(err);
+
+      if (results.length > 0) {
+        resolve(true);   //  found
+      } else {
+        resolve(false);  //  not found
+      }
+    });
+  });
+};
 
 export const checkEmailExists = async (email, db) => {
   return new Promise((resolve, reject) => {
@@ -131,6 +146,45 @@ export const checkEmailPresent = async (req, res) => {
     });
   }
 };
+
+export const checkPhonePresent = async (req, res) => {
+  const db = req.db;
+  const { phone, country_code } = req.body;
+
+  if (!phone) {
+    return res.status(400).json({
+      success: false,
+      message: "phone missing",
+      datas: []
+    });
+  }
+
+    if (!country_code) {
+    return res.status(400).json({
+      success: false,
+      message: "country code missing",
+      datas: []
+    });
+  }
+  try {
+    const exists = await checkPhoneExists(phone, country_code, db);
+
+    return res.status(200).json({
+      success: true,
+      exists: exists
+    });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      datas: []
+    });
+  }
+};
+
+
 
 export const sendOTP = async (req, res) => {
   try {
@@ -444,22 +498,22 @@ export const verifyLogin = async (req, res) => {
   // CHECK TYPE = PASSWORD LOGIN
   // ============================================================
   if (check_type === "password") {
-    // if (!email) {
-    //   if (!phone_number) {
-    //     return res.status(400).json({ success: false, message: 'phone_number missing', datas: [] });
-    //   }
-    //   if (!countrycode) {
-    //     return res.status(400).json({ success: false, message: 'countrycode missing', datas: [] });
-    //   }
+    if (!email) {
+      if (!phone_number) {
+        return res.status(400).json({ success: false, message: 'phone_number missing', datas: [] });
+      }
+      if (!countrycode) {
+        return res.status(400).json({ success: false, message: 'countrycode missing', datas: [] });
+      }
 
-    //   const query = 'SELECT id, group_id, first_name, last_name, email_id, phone, country_code, hash, salt FROM smt_users WHERE phone = ? AND country_code = ?';
-    //   result = await new Promise((resolve, reject) => {
-    //     db.query(query, [phone_number, countrycode], (err, rows) => {
-    //       if (err) reject(err);
-    //       resolve(rows);
-    //     });
-    //   });
-    // } else {
+      const query = 'SELECT id, group_id, first_name, last_name, email_id, phone, country_code, hash, salt FROM smt_users WHERE phone = ? AND country_code = ?';
+      result = await new Promise((resolve, reject) => {
+        db.query(query, [phone_number, countrycode], (err, rows) => {
+          if (err) reject(err);
+          resolve(rows);
+        });
+      });
+    } else {
       const query = 'SELECT id, group_id, first_name, last_name, email_id, phone, country_code, hash, salt FROM smt_users WHERE email_id = ?';
       result = await new Promise((resolve, reject) => {
         db.query(query, [email], (err, rows) => {
@@ -467,7 +521,7 @@ export const verifyLogin = async (req, res) => {
           resolve(rows);
         });
       });
-   // }
+    }
 
     if (result.length > 0) {
       if (!result[0].salt || !result[0].hash) {
@@ -481,7 +535,7 @@ export const verifyLogin = async (req, res) => {
 
       if (isValid) {
         const userdet = {
-          first_name: result[0].first_name,
+          first_name: result[0].first_name ? result[0].first_name: 'Traveller',
           last_name: result[0].last_name,
           email_id: result[0].email_id,
           phone: result[0].phone,
@@ -539,12 +593,12 @@ export const verifyLogin = async (req, res) => {
 
       if (isValid) {
         let ret_id = 0;
-
+        var userdetail = {};
         // ---------------------------------------
         // Fetch or Insert User
         // ---------------------------------------
         if (!email) {
-          const query = 'SELECT id, group_id, email_id, first_name, last_name FROM smt_users WHERE phone = ? AND country_code = ?';
+          const query = 'SELECT id, group_id, email_id, first_name, last_name, phone, country_code FROM smt_users WHERE phone = ? AND country_code = ?';
           const users = await new Promise((resolve, reject) => {
             db.query(query, [phone_number, countrycode], (err, rows) => {
               if (err) reject(err);
@@ -563,13 +617,22 @@ export const verifyLogin = async (req, res) => {
             });
 
             ret_id = insertResult.insertId;
-
+            userdetail.first_name = 'Traveller';
+            userdetail.last_name = '';
+            userdetail.email_id = '';
+            userdetail.phone = phone_number;
+            userdetail.countrycode = countrycode;
           } else {
             ret_id = users[0].id;
+            userdetail.first_name = users[0].first_name ? users[0].first_name: 'Traveller';
+            userdetail.last_name = users[0].last_name;
+            userdetail.email_id = users[0].email_id;
+            userdetail.phone = users[0].phone;
+            userdetail.countrycode = users[0].country_code;
           }
         }else{
 
-          const query = 'SELECT id, group_id, email_id, first_name, last_name FROM smt_users WHERE email_id = ?';
+          const query = 'SELECT id, group_id, email_id, first_name, last_name, phone, country_code FROM smt_users WHERE email_id = ?';
           const users = await new Promise((resolve, reject) => {
             db.query(query, [email], (err, rows) => {
               if (err) reject(err);
@@ -589,8 +652,20 @@ export const verifyLogin = async (req, res) => {
 
             ret_id = insertResult.insertId;
 
+            userdetail.first_name = 'Traveller';
+            userdetail.last_name = '';
+            userdetail.email_id = email;
+            userdetail.phone = '';
+            userdetail.countrycode = '';
+
           } else {
             ret_id = users[0].id;
+
+            userdetail.first_name = users[0].first_name ? users[0].first_name: 'Traveller';
+            userdetail.last_name = users[0].last_name;
+            userdetail.email_id = users[0].email_id;
+            userdetail.phone = users[0].phone;
+            userdetail.countrycode = users[0].country_code;
           }
           
         }
@@ -601,7 +676,7 @@ export const verifyLogin = async (req, res) => {
         return res.status(200).json({
           success: true,
           message: 'OTP Matched',
-          datas: [{ token }]
+          datas: [{ token, userdetail }]
         });
 
       } else {

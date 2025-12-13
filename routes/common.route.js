@@ -9,6 +9,7 @@ const router = express.Router();
 
 
 router.route('/users/checkemail').post(userCtrl.checkEmailPresent);
+router.route('/users/checkphone').post(userCtrl.checkPhonePresent);
 router.route('/users/sendotp').post(userCtrl.sendOTP);
 router.route('/users/verifylogin').post(userCtrl.verifyLogin);
 router.route('/users/resetpassword').post(userCtrl.sendResetPassword);

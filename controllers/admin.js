@@ -157,7 +157,10 @@ export const verifyLogin = async (req, res) => {
       last_name: user.last_name,
       email_id: user.email_id,
       phone: user.phone,
-      countrycode: user.country_code
+      countrycode: user.country_code,
+      profile:user.profile
+        ? `${config.baseurl}${user.profile}`
+        : config.fileurl + 'user/default_profile.png',
     };
 
     // Token
