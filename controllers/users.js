@@ -1073,58 +1073,58 @@ export const verifyResetPassword = async (req, res) => {
   // ---------------------------
   // Fetch User
   // ---------------------------
-  // let getusers;
+  let getusers;
 
-  // if (!email) {
-  //   getusers = await new Promise((resolve, reject) => {
-  //     db.query(
-  //       `SELECT id, group_id, email_id, first_name, last_name, phone, country_code 
-  //        FROM smt_users WHERE phone = ? AND country_code = ?`,
-  //       [phone_number, countrycode],
-  //       (err, rows) => (err ? reject(err) : resolve(rows))
-  //     );
-  //   });
-  // } else {
-  //   getusers = await new Promise((resolve, reject) => {
-  //     db.query(
-  //       `SELECT id, group_id, phone, country_code, first_name, last_name, email_id 
-  //        FROM smt_users WHERE email_id = ?`,
-  //       [email],
-  //       (err, rows) => (err ? reject(err) : resolve(rows))
-  //     );
-  //   });
-  // }
+  if (!email) {
+    getusers = await new Promise((resolve, reject) => {
+      db.query(
+        `SELECT id, group_id, email_id, first_name, last_name, phone, country_code 
+         FROM smt_users WHERE phone = ? AND country_code = ?`,
+        [phone_number, countrycode],
+        (err, rows) => (err ? reject(err) : resolve(rows))
+      );
+    });
+  } else {
+    getusers = await new Promise((resolve, reject) => {
+      db.query(
+        `SELECT id, group_id, phone, country_code, first_name, last_name, email_id 
+         FROM smt_users WHERE email_id = ?`,
+        [email],
+        (err, rows) => (err ? reject(err) : resolve(rows))
+      );
+    });
+  }
 
-  // // -------------------------------------
-  // // FIXED: Correct condition (your code had reversed logic)
-  // // -------------------------------------
-  // if (getusers.length === 0) {
-  //   return res.status(400).json({
-  //     success: false,
-  //     message: "No User Found",
-  //     datas: []
-  //   });
-  // }
+  // -------------------------------------
+  // FIXED: Correct condition (your code had reversed logic)
+  // -------------------------------------
+  if (getusers.length === 0) {
+    return res.status(400).json({
+      success: false,
+      message: "No User Found",
+      datas: []
+    });
+  }
 
-  // // ---------------------------
-  // // Prepare user data
-  // // ---------------------------
-  // const user = getusers[0];
+  // ---------------------------
+  // Prepare user data
+  // ---------------------------
+  const user = getusers[0];
 
-  // const userdet = {
-  //   first_name: user.first_name || "",
-  //   last_name: user.last_name || "",
-  //   email_id: user.email_id || "",
-  //   phone: user.phone || "",
-  //   countrycode: user.country_code || ""
-  // };
+  const userdet = {
+    first_name: user.first_name || "Traveller",
+    last_name: user.last_name || "",
+    email_id: user.email_id || "",
+    phone: user.phone || "",
+    countrycode: user.country_code || ""
+  };
 
-  // const token = generateJwt(user.id, user.group_id);
+  const token = generateJwt(user.id, user.group_id);
 
   return res.status(200).json({
     success: true,
     message: "OTP Matched",
-    datas: []
+    datas: [{token, userdet}]
   });
 };
 
