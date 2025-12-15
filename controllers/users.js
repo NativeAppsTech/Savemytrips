@@ -859,7 +859,7 @@ export const sendResetPassword = async (req, res) => {
         });
       });
     }
-
+    console.log(getusers);
     // ---------------------------------------------
     // USER NOT FOUND → SEND OTP
     // ---------------------------------------------
