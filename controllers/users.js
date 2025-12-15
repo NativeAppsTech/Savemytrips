@@ -863,7 +863,7 @@ export const sendResetPassword = async (req, res) => {
     // ---------------------------------------------
     // USER NOT FOUND → SEND OTP
     // ---------------------------------------------
-    if (getusers.length === 0) {
+    if (getusers.length > 0) {
 
       // ---------------- SMS OTP ----------------
       if (!email) {
