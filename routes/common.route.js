@@ -15,4 +15,6 @@ router.route('/users/verifylogin').post(userCtrl.verifyLogin);
 router.route('/users/resetpassword').post(userCtrl.sendResetPassword);
 router.route('/users/verifyresetpassword').post(userCtrl.verifyResetPassword);
 router.route('/users/setpassword').post(verifyToken, userCtrl.setpasswordfromlogin);
+
+router.route('/users/countryswitch').post(userCtrl.countryswith);
 export default router;

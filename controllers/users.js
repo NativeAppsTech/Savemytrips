@@ -185,7 +185,6 @@ export const checkPhonePresent = async (req, res) => {
 };
 
 
-
 export const sendOTP = async (req, res) => {
   try {
     const otp = getRandomInt(100000, 999999);
@@ -316,7 +315,63 @@ export const sendOTP = async (req, res) => {
   }
 };
 
+export const countryswith = async (req, res) => {
 
+    const db = req.db;
+    const { country_code } = req.body; // or req.query
+  
+    if (!country_code) {
+      return res.status(400).json({
+        success: false,
+        message: "country_code is required",
+        datas: []
+      });
+    }
+  
+    try {
+      const query = `
+        SELECT 
+          id,
+          currency_code,
+          phone_code,
+          country
+        FROM smt_currencies
+        WHERE country_code = ?
+        LIMIT 1
+      `;
+  
+      const result = await new Promise((resolve, reject) => {
+        db.query(query, [country_code.toUpperCase()], (err, rows) => {
+          if (err) reject(err);
+          resolve(rows);
+        });
+      });
+  
+      if (result.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "Currency not found for this country",
+          datas: []
+        });
+      }
+  
+      return res.status(200).json({
+        success: true,
+        message: "Currency fetched successfully",
+        datas: result
+      });
+  
+    } catch (error) {
+      console.error("getCurrencyByCountry error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Server error",
+        datas: []
+      });
+    }
+
+
+};
 
 // export const verifyLogin = async (req, res) => { 
 //   if (!req.body) {
