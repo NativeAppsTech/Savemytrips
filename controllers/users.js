@@ -335,8 +335,8 @@ export const countryswith = async (req, res) => {
           currency_code,
           phone_code,
           country
-        FROM smt_currencies
-        WHERE country_code = ?
+        FROM smt_country
+        WHERE iso_code_2 = ?
         LIMIT 1
       `;
   
@@ -1205,6 +1205,204 @@ export const setpasswordfromlogin = async (req, res) => {
     });
   }
 };
+
+
+export const updateUserProfile = async (req, res) => {
+  const db = req.db;
+
+  try {
+    const userId = req.userId;
+
+    const {
+      first_name,
+      last_name,
+      gender,
+      dob,
+      marital_status,
+      country,
+      state,
+      city,
+      passport_number,
+      passport_exp_date,
+      passport_issue_country,
+      spl_id_type,
+      spl_id_number
+    } = req.body;
+
+    // Build update fields dynamically
+    const fields = [];
+    const values = [];
+
+    if (first_name !== undefined) {
+      fields.push("first_name = ?");
+      values.push(first_name);
+    }
+
+    if (last_name !== undefined) {
+      fields.push("last_name = ?");
+      values.push(last_name);
+    }
+
+    if (gender !== undefined) {
+      fields.push("gender = ?");
+      values.push(gender);
+    }
+
+    if (dob !== undefined) {
+      fields.push("dob = ?");
+      values.push(dob);
+    }
+
+    if (marital_status !== undefined) {
+      fields.push("marital_status = ?");
+      values.push(marital_status);
+    }
+
+    if (country !== undefined) {
+      fields.push("country = ?");
+      values.push(country);
+    }
+
+    if (state !== undefined) {
+      fields.push("state = ?");
+      values.push(state);
+    }
+
+    if (city !== undefined) {
+      fields.push("city = ?");
+      values.push(city);
+    }
+
+    if (passport_number !== undefined) {
+      fields.push("passport_number = ?");
+      values.push(passport_number);
+    }
+
+    if (passport_exp_date !== undefined) {
+      fields.push("passport_exp_date = ?");
+      values.push(passport_exp_date);
+    }
+
+    if (passport_issue_country !== undefined) {
+      fields.push("passport_issue_country = ?");
+      values.push(passport_issue_country);
+    }
+
+    if (spl_id_type !== undefined) {
+      fields.push("spl_id_type = ?");
+      values.push(spl_id_type);
+    }
+
+    if (spl_id_number !== undefined) {
+      fields.push("spl_id_number = ?");
+      values.push(spl_id_number);
+    }
+
+    if (fields.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No fields provided for update"
+      });
+    }
+
+    const updateQuery = `
+      UPDATE smt_users
+      SET ${fields.join(", ")}
+      WHERE id = ?
+        AND deleted = 0
+    `;
+
+    values.push(userId);
+
+    await new Promise((resolve, reject) => {
+      db.query(updateQuery, values, (err, result) => {
+        if (err) return reject(err);
+        resolve(result);
+      });
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile updated successfully"
+    });
+
+  } catch (error) {
+    console.error("Update user profile error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message
+    });
+  }
+};
+
+export const getUserProfile = async (req, res) => {
+  const db = req.db;
+
+  try {
+    const userId = req.userId; // logged-in user id
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "User ID is required"
+      });
+    }
+
+    const query = `
+      SELECT
+        first_name,
+        last_name,
+        gender,
+        dob,
+        marital_status,
+        country,
+        state,
+        city,
+        phone,
+        country_code,
+        email_id,
+        passport_number,
+        passport_exp_date,
+        passport_issue_country,
+        spl_id_type,
+        spl_id_number
+      FROM smt_users
+      WHERE id = ? AND deleted = 0
+      LIMIT 1
+    `;
+
+    const rows = await new Promise((resolve, reject) => {
+      db.query(query, [userId], (err, result) => {
+        if (err) return reject(err);
+        resolve(result);
+      });
+    });
+
+    if (rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "User profile fetched successfully",
+      data: rows[0]
+    });
+
+  } catch (error) {
+    console.error("Get user profile error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message
+    });
+  }
+};
+
+
 
 
 
