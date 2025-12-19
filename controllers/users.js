@@ -1279,8 +1279,10 @@ export const updateUserProfile = async (req, res) => {
     }
 
     if (passport_exp_date !== undefined) {
-      fields.push("passport_exp_date = ?");
-      values.push(passport_exp_date);
+      if(passport_exp_date !=''){
+          fields.push("passport_exp_date = ?");
+          values.push(passport_exp_date);
+      }
     }
 
     if (passport_issue_country !== undefined) {
