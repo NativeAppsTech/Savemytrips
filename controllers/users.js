@@ -331,7 +331,7 @@ export const countryswith = async (req, res) => {
     try {
       const query = `
         SELECT 
-          id,
+          country_id,
           currency_code,
           phone_code,
           country
