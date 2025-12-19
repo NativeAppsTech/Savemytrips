@@ -1286,18 +1286,24 @@ export const updateUserProfile = async (req, res) => {
     }
 
     if (passport_issue_country !== undefined) {
-      fields.push("passport_issue_country = ?");
-      values.push(passport_issue_country);
+      if(passport_exp_date !=''){
+        fields.push("passport_issue_country = ?");
+        values.push(passport_issue_country);
+      }
     }
 
     if (spl_id_type !== undefined) {
+      if(spl_id_type !=''){
       fields.push("spl_id_type = ?");
       values.push(spl_id_type);
+      }
     }
 
     if (spl_id_number !== undefined) {
-      fields.push("spl_id_number = ?");
-      values.push(spl_id_number);
+       if(spl_id_number !=''){
+        fields.push("spl_id_number = ?");
+        values.push(spl_id_number);
+       }
     }
 
     if (fields.length === 0) {
