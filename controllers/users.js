@@ -334,7 +334,7 @@ export const countryswith = async (req, res) => {
           country_id,
           currency_code,
           phone_code,
-          country
+          name
         FROM smt_country
         WHERE iso_code_2 = ?
         LIMIT 1
