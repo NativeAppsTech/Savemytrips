@@ -98,7 +98,7 @@ export const addCoTraveller = async (req, res) => {
       });
     });
 
-    return res.status(201).json({
+    return res.status(200).json({
       success: true,
       message: "Co-traveller added successfully",
       co_traveller_id: result.insertId

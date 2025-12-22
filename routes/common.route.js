@@ -27,5 +27,5 @@ router.route('/users/updatecustomerprofile').post(verifyToken, userCtrl.updateUs
 
 router.route('/traveller/add').post(verifyToken, travellerCtrl.addCoTraveller);
 router.route('/traveller/list').get(verifyToken, travellerCtrl.listCoTravellers);
-router.route('/traveller/update').post(verifyToken, travellerCtrl.updateCoTraveller);
+router.route('/traveller/update/:id').post(verifyToken, travellerCtrl.updateCoTraveller);
 export default router;
