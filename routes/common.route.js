@@ -5,6 +5,7 @@ import verifyToken from './VerifyToken.js';
 //import controller file
 import * as userCtrl from '../controllers/users.js';
 import * as commonCtrl from '../controllers/common.js';
+import * as travellerCtrl from '../controllers/traveller.js';
 // get an instance of express router
 const router = express.Router();
 
@@ -24,5 +25,7 @@ router.route('/common/getsplids').get(verifyToken, commonCtrl.listSpecialCountry
 router.route('/users/getcustomerprofile').get(verifyToken, userCtrl.getUserProfile);
 router.route('/users/updatecustomerprofile').post(verifyToken, userCtrl.updateUserProfile);
 
-
+router.route('/traveller/add').post(verifyToken, travellerCtrl.addCoTraveller);
+router.route('/traveller/list').get(verifyToken, travellerCtrl.listCoTravellers);
+router.route('/traveller/update').post(verifyToken, travellerCtrl.updateCoTraveller);
 export default router;
