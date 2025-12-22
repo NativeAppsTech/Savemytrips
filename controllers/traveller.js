@@ -24,10 +24,31 @@ export const addCoTraveller = async (req, res) => {
     // -----------------------------
     // BASIC VALIDATION
     // -----------------------------
-    if (!first_name || !last_name) {
+    if (!first_name) {
       return res.status(400).json({
         success: false,
-        message: "First name and last name are required"
+        message: "First name is required"
+      });
+    }
+
+    if (!last_name) {
+      return res.status(400).json({
+        success: false,
+        message: "Last name is required"
+      });
+    }
+
+    if (!dob) {
+      return res.status(400).json({
+        success: false,
+        message: "DOB is required"
+      });
+    }
+
+    if (!gender) {
+      return res.status(400).json({
+        success: false,
+        message: "Gender is required"
       });
     }
 
