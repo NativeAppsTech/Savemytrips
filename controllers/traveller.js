@@ -224,7 +224,7 @@ export const updateCoTraveller = async (req, res) => {
       dob,
       country,
       relationship,
-      meals_prefer,
+      meals_prefer || null,
       passport_number,
       passport_exp_date,
       passport_issue_country,
