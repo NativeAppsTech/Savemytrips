@@ -229,7 +229,7 @@ export const updateCoTraveller = async (req, res) => {
       passport_exp_date || null,
       passport_issue_country || null,
       phone_code,
-      phone,
+      phone || null,
       email,
       id,
       userId
