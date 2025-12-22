@@ -264,4 +264,56 @@ export const updateCoTraveller = async (req, res) => {
   }
 };
 
+export const deleteCoTraveller = async (req, res) => {
+  const db = req.db;
+
+  try {
+    const userId = req.userId;
+    const { id } = req.params; // co_traveller id
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "Co-traveller id is required"
+      });
+    }
+
+    const query = `
+      DELETE FROM smt_co_traveller
+      WHERE id = ?
+        AND user_id = ?
+    `;
+
+    const values = [id, userId];
+
+    const result = await new Promise((resolve, reject) => {
+      db.query(query, values, (err, result) => {
+        if (err) return reject(err);
+        resolve(result);
+      });
+    });
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Co-traveller not found or not authorized"
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Co-traveller permanently deleted"
+    });
+
+  } catch (error) {
+    console.error("Hard delete co-traveller error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message
+    });
+  }
+};
+
+
 
