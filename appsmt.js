@@ -10,6 +10,7 @@ let __dirname = path.dirname(__filename);
 // import routes
 import commonRoutes from './routes/common.route.js';
 import adminRoutes from './routes/admin.route.js';
+import agentRoutes from './routes/agent.route.js';
 
 const app = express();
 app.use(cors());
@@ -96,6 +97,7 @@ app.use((req, res, next) => {
 
 app.use('/common', commonRoutes);
 app.use('/admin', adminRoutes);
+app.use('/agent', agentRoutes);
 
 app.get('/', (req, res) => {
   return res.end('Api working for Savemytrip');
