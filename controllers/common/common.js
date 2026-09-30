@@ -1,6 +1,5 @@
 //import getPool from '../db.js';
-import config from '../config.js';
-
+import config from "../../config.js";
 
 export const listCountries = async (req, res) => {
   const db = req.db;
@@ -27,19 +26,17 @@ export const listCountries = async (req, res) => {
       success: true,
       message: "Countries fetched successfully",
       total: rows.length,
-      datas: rows
+      datas: rows,
     });
-
   } catch (error) {
     console.error("List countries error:", error);
     return res.status(500).json({
       success: false,
       message: "Server error",
-      error: error.message
+      error: error.message,
     });
   }
 };
-
 
 export const listZonesByCountry = async (req, res) => {
   const db = req.db;
@@ -50,7 +47,7 @@ export const listZonesByCountry = async (req, res) => {
     if (!country_id) {
       return res.status(400).json({
         success: false,
-        message: "country_id is required"
+        message: "country_id is required",
       });
     }
 
@@ -77,19 +74,17 @@ export const listZonesByCountry = async (req, res) => {
       success: true,
       message: "Zones fetched successfully",
       total: rows.length,
-      datas: rows
+      datas: rows,
     });
-
   } catch (error) {
     console.error("List zones error:", error);
     return res.status(500).json({
       success: false,
       message: "Server error",
-      error: error.message
+      error: error.message,
     });
   }
 };
-
 
 export const listSpecialCountryUserIds = async (req, res) => {
   const db = req.db;
@@ -100,7 +95,7 @@ export const listSpecialCountryUserIds = async (req, res) => {
     if (!country_id) {
       return res.status(400).json({
         success: false,
-        message: "country_id is required"
+        message: "country_id is required",
       });
     }
 
@@ -123,15 +118,14 @@ export const listSpecialCountryUserIds = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Special ID list fetched successfully",
-      datas: rows
+      datas: rows,
     });
-
   } catch (error) {
     console.error("Special country ID list error:", error);
     return res.status(500).json({
       success: false,
       message: "Server error",
-      error: error.message
+      error: error.message,
     });
   }
 };

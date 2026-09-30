@@ -1,5 +1,5 @@
 //import getPool from '../db.js';
-import config from '../config.js';
+import config from "../../config.js";
 
 export const addCoTraveller = async (req, res) => {
   const db = req.db;
@@ -18,7 +18,7 @@ export const addCoTraveller = async (req, res) => {
       passport_issue_country,
       phone_code,
       phone,
-      email
+      email,
     } = req.body;
 
     // -----------------------------
@@ -27,28 +27,28 @@ export const addCoTraveller = async (req, res) => {
     if (!first_name) {
       return res.status(400).json({
         success: false,
-        message: "First name is required"
+        message: "First name is required",
       });
     }
 
     if (!last_name) {
       return res.status(400).json({
         success: false,
-        message: "Last name is required"
+        message: "Last name is required",
       });
     }
 
     if (!dob) {
       return res.status(400).json({
         success: false,
-        message: "DOB is required"
+        message: "DOB is required",
       });
     }
 
     if (!gender) {
       return res.status(400).json({
         success: false,
-        message: "Gender is required"
+        message: "Gender is required",
       });
     }
 
@@ -75,7 +75,7 @@ export const addCoTraveller = async (req, res) => {
     `;
 
     const values = [
-      req.userId,                     // 👈 logged-in user
+      req.userId, // 👈 logged-in user
       first_name.trim(),
       last_name.trim(),
       gender || null,
@@ -88,7 +88,7 @@ export const addCoTraveller = async (req, res) => {
       passport_issue_country || null,
       phone_code || null,
       phone || null,
-      email || null
+      email || null,
     ];
 
     const result = await new Promise((resolve, reject) => {
@@ -101,15 +101,14 @@ export const addCoTraveller = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Co-traveller added successfully",
-      co_traveller_id: result.insertId
+      co_traveller_id: result.insertId,
     });
-
   } catch (error) {
     console.error("Add co-traveller error:", error);
     return res.status(500).json({
       success: false,
       message: "Server error",
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -153,15 +152,14 @@ export const listCoTravellers = async (req, res) => {
       success: true,
       message: "Co-travellers fetched successfully",
       total: rows.length,
-      datas: rows
+      datas: rows,
     });
-
   } catch (error) {
     console.error("List co-travellers error:", error);
     return res.status(500).json({
       success: false,
       message: "Server error",
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -186,13 +184,13 @@ export const updateCoTraveller = async (req, res) => {
       passport_issue_country,
       phone_code,
       phone,
-      email
+      email,
     } = req.body;
 
     if (!id) {
       return res.status(400).json({
         success: false,
-        message: "Co-traveller id is required"
+        message: "Co-traveller id is required",
       });
     }
 
@@ -232,7 +230,7 @@ export const updateCoTraveller = async (req, res) => {
       phone || null,
       email,
       id,
-      userId
+      userId,
     ];
 
     const result = await new Promise((resolve, reject) => {
@@ -245,21 +243,20 @@ export const updateCoTraveller = async (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({
         success: false,
-        message: "Co-traveller not found or not authorized"
+        message: "Co-traveller not found or not authorized",
       });
     }
 
     return res.status(200).json({
       success: true,
-      message: "Co-traveller updated successfully"
+      message: "Co-traveller updated successfully",
     });
-
   } catch (error) {
     console.error("Update co-traveller error:", error);
     return res.status(500).json({
       success: false,
       message: "Server error",
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -274,7 +271,7 @@ export const deleteCoTraveller = async (req, res) => {
     if (!id) {
       return res.status(400).json({
         success: false,
-        message: "Co-traveller id is required"
+        message: "Co-traveller id is required",
       });
     }
 
@@ -296,24 +293,20 @@ export const deleteCoTraveller = async (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({
         success: false,
-        message: "Co-traveller not found or not authorized"
+        message: "Co-traveller not found or not authorized",
       });
     }
 
     return res.status(200).json({
       success: true,
-      message: "Co-traveller permanently deleted"
+      message: "Co-traveller permanently deleted",
     });
-
   } catch (error) {
     console.error("Hard delete co-traveller error:", error);
     return res.status(500).json({
       success: false,
       message: "Server error",
-      error: error.message
+      error: error.message,
     });
   }
 };
-
-
-
